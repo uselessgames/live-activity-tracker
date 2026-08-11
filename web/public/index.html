@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Live Tracking</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css" />
+</head>
+<body>
+  <div id="map"></div>
+
+  <div id="infoPanel" class="info-panel">
+    <div class="info-header">
+      <strong id="infoTitle"></strong>
+      <button class="info-close" id="infoClose">&times;</button>
+    </div>
+    <div class="info-row">Last seen: <span id="infoLastSeen"></span></div>
+    <div class="info-row">Track: <button class="track-toggle" id="trackToggleBtn"></button></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([0.518389,25.205708], 14);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    const locationDotIcon = L.divIcon({
+      className: 'location-dot',
+      html: '<i class="fa-solid fa-location-dot"></i>',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41]
+    });
+
+    L.control.scale({ metric: true, imperial: false }).addTo(map);
+
+    const markers = {};
+    const tracks = {};
+    const trackPoints = {};
+    const trackVisible = {};
+    const lastSeen = {};
+    let lastLatLng = null;
+    let follow = true;
+    let activeTrackerId = null;
+
+    const CrosshairControl = L.Control.extend({
+      options: { position: 'topleft' },
+      onAdd: function () {
+        const container = L.DomUtil.create('div', 'leaflet-bar crosshair-btn active');
+        container.innerHTML = '<i class="fa-solid fa-crosshairs"></i>';
+        L.DomEvent.disableClickPropagation(container);
+        L.DomEvent.on(container, 'click', () => {
+          follow = !follow;
+          container.classList.toggle('active', follow);
+          if (follow && lastLatLng) map.panTo(lastLatLng);
+        });
+        this._container = container;
+        return container;
+      }
+    });
+    const crosshairControl = new CrosshairControl();
+    map.addControl(crosshairControl);
+
+    map.on('dragstart', () => {
+      follow = false;
+      crosshairControl._container.classList.remove('active');
+    });
+
+    function timeAgo(isoString) {
+      const seconds = Math.floor((Date.now() - new Date(isoString).getTime()) / 1000);
+      if (seconds < 60) return `${seconds}s ago`;
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes}m ago`;
+      const hours = Math.floor(minutes / 60);
+      return `${hours}h ago`;
+    }
+
+    function openInfoPanel(trackerId) {
+      activeTrackerId = trackerId;
+      document.getElementById('infoTitle').textContent = `Tracker ${trackerId}`;
+      document.getElementById('infoLastSeen').textContent = timeAgo(lastSeen[trackerId]);
+      document.getElementById('trackToggleBtn').textContent = trackVisible[trackerId] ? 'Hide' : 'Show';
+      document.getElementById('infoPanel').classList.add('visible');
+    }
+
+    document.getElementById('infoClose').addEventListener('click', () => {
+      document.getElementById('infoPanel').classList.remove('visible');
+    });
+
+    document.getElementById('trackToggleBtn').addEventListener('click', () => {
+      if (activeTrackerId === null) return;
+      trackVisible[activeTrackerId] = !trackVisible[activeTrackerId];
+      if (trackVisible[activeTrackerId]) {
+        tracks[activeTrackerId].addTo(map);
+      } else {
+        map.removeLayer(tracks[activeTrackerId]);
+      }
+      document.getElementById('trackToggleBtn').textContent = trackVisible[activeTrackerId] ? 'Hide' : 'Show';
+    });
+
+    function addPoint(trackerId, lat, lon, reportedAt, pan) {
+      const latlng = [lat, lon];
+      lastLatLng = latlng;
+      lastSeen[trackerId] = reportedAt;
+
+      if (!trackPoints[trackerId]) {
+        trackPoints[trackerId] = [];
+      }
+      trackPoints[trackerId].push(latlng);
+
+      if (tracks[trackerId]) {
+        tracks[trackerId].setLatLngs(trackPoints[trackerId]);
+      } else {
+        trackVisible[trackerId] = false;
+        tracks[trackerId] = L.polyline(trackPoints[trackerId], {
+          color: '#FF0077',
+          opacity: 0.75
+        });
+      }
+
+      if (markers[trackerId]) {
+        markers[trackerId].setLatLng(latlng);
+      } else {
+        markers[trackerId] = L.marker(latlng, { icon: locationDotIcon }).addTo(map);
+        markers[trackerId].on('click', () => openInfoPanel(trackerId));
+      }
+
+      if (pan && follow) map.panTo(latlng);
+    }
+
+    const ws = new WebSocket('ws://localhost:8081');
+
+    ws.onmessage = (event) => {
+      const pos = JSON.parse(event.data);
+      addPoint(pos.tracker_id, pos.lat, pos.lon, pos.reported_at, true);
+
+      const zoom = map.getZoom();
+      const hash = `#${zoom}/${pos.lat.toFixed(6)}/${pos.lon.toFixed(6)}`;
+      history.replaceState(null, '', hash);
+    };
+  </script>
+</body>
+</html>

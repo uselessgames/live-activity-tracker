@@ -1,0 +1,14 @@
+# Docker
+db_data/
+
+# Font Awesome (downloaded locally, not committed)
+web/public/vendor/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
