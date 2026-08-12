@@ -67,8 +67,8 @@
       crosshairControl._container.classList.remove('active');
     });
 
-    function timeAgo(isoString) {
-      const seconds = Math.floor((Date.now() - new Date(isoString).getTime()) / 1000);
+    function timeAgo(epochSeconds) {
+      const seconds = Math.floor(Date.now() / 1000) - epochSeconds;
       if (seconds < 60) return `${seconds}s ago`;
       const minutes = Math.floor(seconds / 60);
       if (minutes < 60) return `${minutes}m ago`;
@@ -99,10 +99,10 @@
       document.getElementById('trackToggleBtn').textContent = trackVisible[activeTrackerId] ? 'Hide' : 'Show';
     });
 
-    function addPoint(trackerId, lat, lon, reportedAt, pan) {
+    function addPoint(trackerId, lat, lon, timeRecorded, pan) {
       const latlng = [lat, lon];
       lastLatLng = latlng;
-      lastSeen[trackerId] = reportedAt;
+      lastSeen[trackerId] = timeRecorded;
 
       if (!trackPoints[trackerId]) {
         trackPoints[trackerId] = [];
@@ -133,7 +133,7 @@
 
     ws.onmessage = (event) => {
       const pos = JSON.parse(event.data);
-      addPoint(pos.tracker_id, pos.lat, pos.lon, pos.reported_at, true);
+      addPoint(pos.tracker_id, pos.lat, pos.lon, pos.time_recorded, true);
 
       const zoom = map.getZoom();
       const hash = `#${zoom}/${pos.lat.toFixed(6)}/${pos.lon.toFixed(6)}`;

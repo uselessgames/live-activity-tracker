@@ -9,9 +9,10 @@ CREATE TABLE positions (
     tracker_id INTEGER REFERENCES trackers(id),
     lat DOUBLE PRECISION NOT NULL,
     lon DOUBLE PRECISION NOT NULL,
-    reported_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    time_recorded BIGINT NOT NULL,
+    time_received BIGINT NOT NULL DEFAULT extract(epoch from now())::BIGINT
 );
 
-CREATE INDEX idx_positions_tracker_time ON positions (tracker_id, reported_at);
+CREATE INDEX idx_positions_tracker_time ON positions (tracker_id, time_recorded);
 
 INSERT INTO trackers (name, api_key) VALUES ('Test Tracker', 'test-key-123');

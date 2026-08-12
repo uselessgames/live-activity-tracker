@@ -10,6 +10,8 @@ SLEEP_INTERVAL="${1:-1}"
 API_KEY="test-key-123"
 URL="http://localhost:8080/api/report.php"
 
+TIME_RECORDED=$(date +%s)
+
 while true; do
   read LAT LON HEADING <<< $(awk -v lat="$LAT" -v lon="$LON" -v heading="$HEADING" -v dist="$DIST" 'BEGIN {
     srand(systime() + PROCINFO["pid"] + int(rand()*100000));
@@ -23,11 +25,15 @@ while true; do
     dlon = (dist * sin(rad)) / (111320 * cos(lat * pi / 180));
     printf "%.8f %.8f %.4f", lat + dlat, lon + dlon, new_heading;
   }')
+  
+  # random 7-18 minutes (420-1080s) ahead of the previous time_recorded
+  TIME_OFFSET=$(( (RANDOM % 661) + 420 ))
+  TIME_RECORDED=$(( TIME_RECORDED + TIME_OFFSET ))
 
   curl -s -X POST "$URL" \
     -H "Content-Type: application/json" \
-    -d "{\"api_key\":\"$API_KEY\",\"lat\":$LAT,\"lon\":$LON}" > /dev/null
+    -d "{\"api_key\":\"$API_KEY\",\"lat\":$LAT,\"lon\":$LON,\"time_recorded\":$TIME_RECORDED}" > /dev/null
 
-  echo "sent: $LAT, $LON (heading: $HEADING)"
+  echo "lat $LAT, lon $LON time: $TIME_RECORDED"
   sleep $SLEEP_INTERVAL  # Use the variable here
 done

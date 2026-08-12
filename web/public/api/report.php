@@ -3,7 +3,7 @@ header('Content-Type: application/json');
 
 $data = json_decode(file_get_contents('php://input'), true);
 
-if (!isset($data['api_key'], $data['lat'], $data['lon'])) {
+if (!isset($data['api_key'], $data['lat'], $data['lon'], $data['time_recorded'])) {
     http_response_code(400);
     echo json_encode(['error' => 'missing fields']);
     exit;
@@ -21,15 +21,18 @@ if (!$tracker) {
     exit;
 }
 
-$stmt = $pdo->prepare('INSERT INTO positions (tracker_id, lat, lon) VALUES (?, ?, ?) RETURNING id, reported_at');
-$stmt->execute([$tracker['id'], $data['lat'], $data['lon']]);
+$timeReceived = time();
+
+$stmt = $pdo->prepare('INSERT INTO positions (tracker_id, lat, lon, time_recorded, time_received) VALUES (?, ?, ?, ?, ?) RETURNING id, time_recorded, time_received');
+$stmt->execute([$tracker['id'], $data['lat'], $data['lon'], $data['time_recorded'], $timeReceived]);
 $position = $stmt->fetch();
 
 $payload = json_encode([
     'tracker_id' => $tracker['id'],
     'lat' => $data['lat'],
     'lon' => $data['lon'],
-    'reported_at' => $position['reported_at'],
+    'time_recorded' => (int)$position['time_recorded'],
+    'time_received' => (int)$position['time_received'],
 ]);
 
 $sock = @fsockopen('ws', 8082, $errno, $errstr, 1);

@@ -4,9 +4,9 @@ header('Content-Type: application/json');
 $pdo = new PDO('pgsql:host=db;dbname=tracking', 'tracking', 'tracking');
 
 $stmt = $pdo->query('
-    SELECT tracker_id, lat, lon, reported_at
+    SELECT tracker_id, lat, lon, time_recorded, time_received
     FROM positions
-    ORDER BY tracker_id, reported_at ASC
+    ORDER BY tracker_id, time_recorded ASC
 ');
 
 $result = [];
@@ -18,7 +18,8 @@ while ($row = $stmt->fetch()) {
     $result[$tid][] = [
         'lat' => (float)$row['lat'],
         'lon' => (float)$row['lon'],
-        'reported_at' => $row['reported_at']
+        'time_recorded' => (int)$row['time_recorded'],
+        'time_received' => (int)$row['time_received']
     ];
 }
 

@@ -35,7 +35,7 @@ Report a location
 ```bash
 curl -X POST http://localhost:8080/api/report.php \
   -H "Content-Type: application/json" \
-  -d '{"api_key":"test-key-123","lat":0.00000,"lon":0.00000}'
+  -d '{"api_key":"test-key-123","lat":0.00000,"lon":0.00000,"time_recorded":1723459200}'
 ```
 
 Simulating live movement
