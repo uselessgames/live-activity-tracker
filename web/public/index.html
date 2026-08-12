@@ -17,6 +17,7 @@
     </div>
     <div class="info-row">Last seen: <span id="infoLastSeen"></span></div>
     <div class="info-row">Track: <button class="track-toggle" id="trackToggleBtn"></button></div>
+    <div class="info-row">Calculated speed: <span id="infoSpeed"></span></div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -40,6 +41,7 @@
     const trackPoints = {};
     const trackVisible = {};
     const lastSeen = {};
+    const lastSpeed = {};
     let lastLatLng = null;
     let follow = true;
     let activeTrackerId = null;
@@ -80,6 +82,7 @@
       activeTrackerId = trackerId;
       document.getElementById('infoTitle').textContent = `Tracker ${trackerId}`;
       document.getElementById('infoLastSeen').textContent = timeAgo(lastSeen[trackerId]);
+      document.getElementById('infoSpeed').textContent = lastSpeed[trackerId] !== null && lastSpeed[trackerId] !== undefined? `${lastSpeed[trackerId].toFixed(1)} km/h`: 'N/A';
       document.getElementById('trackToggleBtn').textContent = trackVisible[trackerId] ? 'Hide' : 'Show';
       document.getElementById('infoPanel').classList.add('visible');
     }
@@ -99,10 +102,11 @@
       document.getElementById('trackToggleBtn').textContent = trackVisible[activeTrackerId] ? 'Hide' : 'Show';
     });
 
-    function addPoint(trackerId, lat, lon, timeRecorded, pan) {
+    function addPoint(trackerId, lat, lon, timeRecorded, speedCalculated, pan) {
       const latlng = [lat, lon];
       lastLatLng = latlng;
       lastSeen[trackerId] = timeRecorded;
+      lastSpeed[trackerId] = speedCalculated;
 
       if (!trackPoints[trackerId]) {
         trackPoints[trackerId] = [];
@@ -136,6 +140,7 @@
       addPoint(pos.tracker_id, pos.lat, pos.lon, pos.time_recorded, true);
 
       const zoom = map.getZoom();
+      addPoint(pos.tracker_id, pos.lat, pos.lon, pos.time_recorded, pos.speed_calculated, true);
       const hash = `#${zoom}/${pos.lat.toFixed(6)}/${pos.lon.toFixed(6)}`;
       history.replaceState(null, '', hash);
     };

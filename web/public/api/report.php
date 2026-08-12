@@ -23,8 +23,32 @@ if (!$tracker) {
 
 $timeReceived = time();
 
-$stmt = $pdo->prepare('INSERT INTO positions (tracker_id, lat, lon, time_recorded, time_received) VALUES (?, ?, ?, ?, ?) RETURNING id, time_recorded, time_received');
-$stmt->execute([$tracker['id'], $data['lat'], $data['lon'], $data['time_recorded'], $timeReceived]);
+// fetch the most recent previous point for this tracker to calculate speed
+$stmt = $pdo->prepare('SELECT lat, lon, time_recorded FROM positions WHERE tracker_id = ? ORDER BY time_recorded DESC LIMIT 1');
+$stmt->execute([$tracker['id']]);
+$previous = $stmt->fetch();
+
+$speedCalculated = null;
+
+if ($previous) {
+    $timeDelta = $data['time_recorded'] - $previous['time_recorded'];
+
+    if ($timeDelta > 0) {
+        $earthRadius = 6371000; // metres
+        $dLat = deg2rad($data['lat'] - $previous['lat']);
+        $dLon = deg2rad($data['lon'] - $previous['lon']);
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+             cos(deg2rad($previous['lat'])) * cos(deg2rad($data['lat'])) *
+             sin($dLon / 2) * sin($dLon / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        $distanceMetres = $earthRadius * $c;
+
+        $speedCalculated = ($distanceMetres / $timeDelta) * 3.6; // km/h
+    }
+}
+
+$stmt = $pdo->prepare('INSERT INTO positions (tracker_id, lat, lon, time_recorded, time_received, speed_calculated) VALUES (?, ?, ?, ?, ?, ?) RETURNING id, time_recorded, time_received, speed_calculated');
+$stmt->execute([$tracker['id'], $data['lat'], $data['lon'], $data['time_recorded'], $timeReceived, $speedCalculated]);
 $position = $stmt->fetch();
 
 $payload = json_encode([
@@ -33,6 +57,8 @@ $payload = json_encode([
     'lon' => $data['lon'],
     'time_recorded' => (int)$position['time_recorded'],
     'time_received' => (int)$position['time_received'],
+    'speed_calculated' => $position['speed_calculated'] !== null ? (float)$position['speed_calculated'] : null,
+
 ]);
 
 $sock = @fsockopen('ws', 8082, $errno, $errstr, 1);

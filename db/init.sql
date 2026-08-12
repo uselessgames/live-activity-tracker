@@ -10,7 +10,8 @@ CREATE TABLE positions (
     lat DOUBLE PRECISION NOT NULL,
     lon DOUBLE PRECISION NOT NULL,
     time_recorded BIGINT NOT NULL,
-    time_received BIGINT NOT NULL DEFAULT extract(epoch from now())::BIGINT
+    time_received BIGINT NOT NULL DEFAULT extract(epoch from now())::BIGINT,
+    speed_calculated DOUBLE PRECISION
 );
 
 CREATE INDEX idx_positions_tracker_time ON positions (tracker_id, time_recorded);
