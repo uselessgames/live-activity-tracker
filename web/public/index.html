@@ -133,6 +133,17 @@
       if (pan && follow) map.panTo(latlng);
     }
 
+    fetch('api/track.php')
+      .then(res => res.json())
+      .then(data => {
+        for (const trackerId in data) {
+          data[trackerId].forEach(p =>
+            addPoint(trackerId, p.lat, p.lon, p.time_recorded, p.speed_calculated, false)
+          );
+        }
+        if (lastLatLng) map.panTo(lastLatLng);
+      });
+
     const ws = new WebSocket('ws://localhost:8081');
 
     ws.onmessage = (event) => {
