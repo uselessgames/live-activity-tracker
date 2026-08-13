@@ -27,8 +27,8 @@ while true; do
     printf "%.8f %.8f %.4f", lat + dlat, lon + dlon, new_heading;
   }')
   
-  # random 7-18 minutes (420-1080s) ahead of the previous time_recorded
-  TIME_OFFSET=$(( (RANDOM % 661) + 420 ))
+  # random 6-13secs ahead of the previous time_recorded, target avg around 25 km/h
+  TIME_OFFSET=$(( (RANDOM % 8) + 6 ))
   TIME_RECORDED=$(( TIME_RECORDED + TIME_OFFSET ))
 
   curl -s -X POST "$URL" \
