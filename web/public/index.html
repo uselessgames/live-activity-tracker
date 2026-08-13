@@ -16,8 +16,8 @@
       <button class="info-close" id="infoClose">&times;</button>
     </div>
     <div class="info-row">Last seen: <span id="infoLastSeen"></span></div>
+    <div class="info-row">Speed: <span id="infoSpeed"></span> (estimated)</div>
     <div class="info-row">Track: <button class="track-toggle" id="trackToggleBtn"></button></div>
-    <div class="info-row">Calculated speed: <span id="infoSpeed"></span></div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -90,11 +90,22 @@
     function openInfoPanel(trackerId) {
       activeTrackerId = trackerId;
       document.getElementById('infoTitle').textContent = `Tracker ${trackerId}`;
-      document.getElementById('infoLastSeen').textContent = timeAgo(lastSeen[trackerId]);
-      document.getElementById('infoSpeed').textContent = lastSpeed[trackerId] !== null && lastSpeed[trackerId] !== undefined? `${lastSpeed[trackerId].toFixed(1)} km/h`: 'N/A';
       document.getElementById('trackToggleBtn').textContent = trackVisible[trackerId] ? 'Hide' : 'Show';
+      updateInfoPanel(trackerId);      
       document.getElementById('infoPanel').classList.add('visible');
     }
+
+    function updateInfoPanel(trackerId) {
+      document.getElementById('infoLastSeen').textContent = timeAgo(lastSeen[trackerId]);
+      document.getElementById('infoSpeed').textContent = lastSpeed[trackerId] !== null && lastSpeed[trackerId] !== undefined ? `${lastSpeed[trackerId].toFixed(1)} km/h` : 'N/A';
+    }
+
+    // ticking clock for "last seen" while the panel is open
+    setInterval(() => {
+      if (activeTrackerId !== null) {
+        document.getElementById('infoLastSeen').textContent = timeAgo(lastSeen[activeTrackerId]);
+      }
+    }, 1000);
 
     document.getElementById('infoClose').addEventListener('click', () => {
       document.getElementById('infoPanel').classList.remove('visible');
@@ -142,6 +153,10 @@
       } else {
         markers[trackerId] = L.marker(latlng, { icon: locationDotIcon }).addTo(map);
         markers[trackerId].on('click', () => openInfoPanel(trackerId));
+      }
+
+      if (activeTrackerId === trackerId) {
+        updateInfoPanel(trackerId);
       }
 
       if (pan && follow) map.panTo(latlng);
