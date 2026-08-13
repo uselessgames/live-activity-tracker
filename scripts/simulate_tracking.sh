@@ -4,7 +4,6 @@
 LAT=0.518389
 LON=25.205708
 HEADING=270
-DIST=80       # metres per step
 SLEEP_INTERVAL="${1:-1}" 
 
 API_KEY="test-key-123"
@@ -13,9 +12,11 @@ URL="http://localhost:8080/api/report.php"
 TIME_RECORDED=$(date +%s)
 
 while true; do
-  read LAT LON HEADING <<< $(awk -v lat="$LAT" -v lon="$LON" -v heading="$HEADING" -v dist="$DIST" 'BEGIN {
+  read LAT LON HEADING <<< $(awk -v lat="$LAT" -v lon="$LON" -v heading="$HEADING" 'BEGIN {
     srand(systime() + PROCINFO["pid"] + int(rand()*100000));
     pi = 3.14159265;
+    dist = 40 + rand() * 50;
+    echo "dist";
     offset = (rand() * 60) - 30;
     new_heading = heading + offset;
     while (new_heading < 0)   new_heading += 360;

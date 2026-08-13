@@ -36,6 +36,8 @@
 
     L.control.scale({ metric: true, imperial: false }).addTo(map);
 
+    let defaultMarker = L.marker([0.518389, 25.205708], { icon: locationDotIcon }).addTo(map);
+
     const markers = {};
     const tracks = {};
     const trackPoints = {};
@@ -103,6 +105,11 @@
     });
 
     function addPoint(trackerId, lat, lon, timeRecorded, speedCalculated, pan) {
+      if (defaultMarker) {
+        map.removeLayer(defaultMarker);
+        defaultMarker = null;
+      }
+      
       const latlng = [lat, lon];
       lastLatLng = latlng;
       lastSeen[trackerId] = timeRecorded;
@@ -148,7 +155,6 @@
 
     ws.onmessage = (event) => {
       const pos = JSON.parse(event.data);
-      addPoint(pos.tracker_id, pos.lat, pos.lon, pos.time_recorded, true);
 
       const zoom = map.getZoom();
       addPoint(pos.tracker_id, pos.lat, pos.lon, pos.time_recorded, pos.speed_calculated, true);
