@@ -12,3 +12,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# Test files
+scripts/*.gpx

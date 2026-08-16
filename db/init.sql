@@ -15,4 +15,14 @@ CREATE TABLE positions (
 
 CREATE INDEX idx_positions_tracker_time ON positions (tracker_id, time_recorded);
 
+CREATE TABLE activities (
+    id SERIAL PRIMARY KEY,
+    tracker_id INTEGER REFERENCES trackers(id),
+    name TEXT UNIQUE NOT NULL,
+    start_time BIGINT NOT NULL,
+    end_time BIGINT NOT NULL,
+    duration BIGINT NOT NULL,
+    waypoints JSONB NOT NULL
+);
+
 INSERT INTO trackers (name, api_key) VALUES ('Test Tracker', 'test-key-123');

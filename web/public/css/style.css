@@ -17,7 +17,43 @@ body { margin: 0; }
   color: #FF0077;
   font-size: 41px;
 }
-
+/* Menu */
+.menu-control {
+  background: #fff;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+.menu-toggle {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.menu-toggle:hover { background: #f4f4f4; }
+.menu-toggle i { color: #333; font-size: 16px; }
+.menu-content {
+  display: none;
+  padding: 0 10px 10px;
+  font-size: 13px;
+  color: #666;
+  width: 200px;
+}
+.menu-control.expanded .menu-content { display: block; }
+.menu-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.menu-btn {
+  padding: 3px 10px;
+  border: 1px solid #ccc;
+  background: #f4f4f4;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
 /* Info Box */
 .info-panel {
   display: none;
@@ -55,4 +91,76 @@ body { margin: 0; }
   border-radius: 4px;
   cursor: pointer;
 }
+.info-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+.save-btn {
+  padding: 8px 16px;
+  border: none;
+  background: #28a745;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.save-btn:hover { background: #218838; }
+
+.activities-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.activities-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.back-btn {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  background: #f4f4f4;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 15px;
+}
+.back-btn:hover { background: #e0e0e0; }
+.activities-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+.activities-table th,
+.activities-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+.activities-table th {
+  background: #f8f8f8;
+  font-weight: 600;
+}
+.activities-table td {
+  vertical-align: middle;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+}
+.view-btn, .delete-btn {
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+}
+.view-btn {
+  background: #007bff;
+  color: white;
+}
+.view-btn:hover { background: #0056b3; }
+.delete-btn {
+  background: #dc3545;
+  color: white;
+}
+.delete-btn:hover { background: #c82333; }
 
