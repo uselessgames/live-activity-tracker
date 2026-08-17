@@ -19,7 +19,7 @@ $stmt = $pdo->query('
             LAG(lat) OVER w AS prev_lat,
             LAG(lon) OVER w AS prev_lon,
             LAG(time_recorded) OVER w AS prev_time
-        FROM positions
+        FROM tracker_positions
         WINDOW w AS (PARTITION BY tracker_id ORDER BY time_recorded)
     ) sub
     ORDER BY tracker_id, time_recorded

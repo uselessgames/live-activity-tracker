@@ -30,6 +30,7 @@ header('Content-Type: text/html; charset=utf-8');
         <input type="text" id="activityNameInput" maxlength="50" placeholder="Enter activity name...">
         <button class="save-name-btn" id="saveNameBtn"><i class="fa-solid fa-arrow-right"></i></button>
       </div>
+      <div class="status-container" id="statusContainer"></div>
     </div>
   </div>
 

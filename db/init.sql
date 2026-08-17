@@ -4,7 +4,7 @@ CREATE TABLE trackers (
     api_key TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE positions (
+CREATE TABLE tracker_positions (
     id SERIAL PRIMARY KEY,
     tracker_id INTEGER REFERENCES trackers(id),
     lat DOUBLE PRECISION NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE positions (
     time_received BIGINT NOT NULL DEFAULT extract(epoch from now())::BIGINT
 );
 
-CREATE INDEX idx_positions_tracker_time ON positions (tracker_id, time_recorded);
+CREATE INDEX idx_tracker_positions_tracker_time ON tracker_positions (tracker_id, time_recorded);
 
 CREATE TABLE activities (
     id SERIAL PRIMARY KEY,
@@ -22,7 +22,10 @@ CREATE TABLE activities (
     start_time BIGINT NOT NULL,
     end_time BIGINT NOT NULL,
     duration BIGINT NOT NULL,
-    waypoints JSONB NOT NULL
+    waypoints JSONB NOT NULL,
+    distance DOUBLE PRECISION DEFAULT 0,
+    speed_avg DOUBLE PRECISION DEFAULT 0,
+    speed_max DOUBLE PRECISION DEFAULT 0
 );
 
 INSERT INTO trackers (name, api_key) VALUES ('Test Tracker', 'test-key-123');

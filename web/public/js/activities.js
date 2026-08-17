@@ -122,7 +122,7 @@ fetch('api/activities.php')
     const tbody = document.getElementById('activitiesBody');
 
     if (data.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6">No activities found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8">No activities found</td></tr>';
       return;
     }
 
@@ -130,7 +130,9 @@ fetch('api/activities.php')
       const row = document.createElement('tr');
 
       const duration = formatDuration(activity.start_time, activity.end_time);
-      const waypointCount = activity.waypoints ? activity.waypoints.length : 0;
+      const distance = activity.distance !== null ? `${activity.distance.toFixed(2)}` : '0.00 ';
+      const speedAvg = activity.speed_avg !== null ? `${activity.speed_avg.toFixed(1)}` : '0.0 ';
+      const speedMax = activity.speed_max !== null ? `${activity.speed_max.toFixed(1)}` : '0.0 ';
 
       row.innerHTML = `
         <td class="activity-name-cell">
@@ -142,7 +144,9 @@ fetch('api/activities.php')
         <td>${activity.tracker_id}</td>
         <td>${formatTime(activity.start_time)}</td>
         <td>${duration}</td>
-        <td>${waypointCount}</td>
+        <td>${distance}</td>
+        <td>${speedAvg}</td>
+        <td>${speedMax}</td>
         <td class="actions">
           <button class="view-btn" onclick="viewActivity(${activity.id})">
             <i class="fa-solid fa-eye"></i> View

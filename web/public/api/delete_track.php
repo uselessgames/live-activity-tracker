@@ -10,7 +10,7 @@ if ($trackerId === null) {
     exit;
 }
 
-$stmt = $pdo->prepare('DELETE FROM positions WHERE tracker_id = :tracker_id');
+$stmt = $pdo->prepare('DELETE FROM tracker_positions WHERE tracker_id = :tracker_id');
 $stmt->execute(['tracker_id' => $trackerId]);
 
 echo json_encode(['success' => true]);

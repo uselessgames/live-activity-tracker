@@ -22,7 +22,7 @@ if (!$tracker) {
 }
 
 $timeReceived = time();
-$stmt = $pdo->prepare('INSERT INTO positions (tracker_id, lat, lon, time_recorded, time_received) VALUES (?, ?, ?, ?, ?) RETURNING id, time_recorded, time_received');
+$stmt = $pdo->prepare('INSERT INTO tracker_positions (tracker_id, lat, lon, time_recorded, time_received) VALUES (?, ?, ?, ?, ?) RETURNING id, time_recorded, time_received');
 $stmt->execute([$tracker['id'], $data['lat'], $data['lon'], $data['time_recorded'], $timeReceived]);
 $position = $stmt->fetch();
 
@@ -44,7 +44,7 @@ $stmt = $pdo->prepare('
                 LAG(lat) OVER w AS prev_lat,
                 LAG(lon) OVER w AS prev_lon,
                 LAG(time_recorded) OVER w AS prev_time
-            FROM positions
+            FROM tracker_positions
             WHERE tracker_id = ?
             WINDOW w AS (ORDER BY time_recorded)
         ) sub

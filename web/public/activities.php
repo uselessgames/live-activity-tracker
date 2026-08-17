@@ -24,7 +24,9 @@ header('Content-Type: text/html; charset=utf-8');
           <th>Tracker</th>
           <th>Date</th>
           <th>Duration</th>
-          <th>Points</th>
+          <th>Distance (km)</th>
+          <th>Avg Speed (km/h)</th>
+          <th>Max Speed (km/h)</th>
           <th>Actions</th>
         </tr>
       </thead>

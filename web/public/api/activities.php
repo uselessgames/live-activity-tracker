@@ -6,7 +6,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 if ($method === 'GET') {
     $pdo = new PDO('pgsql:host=db;dbname=tracking', 'tracking', 'tracking');
     
-    $stmt = $pdo->query('SELECT id, tracker_id, name, start_time, end_time, waypoints FROM activities ORDER BY start_time DESC');
+    $stmt = $pdo->query('SELECT id, tracker_id, name, start_time, end_time, distance, speed_avg, speed_max FROM activities ORDER BY start_time DESC');
     
     $results = [];
     while ($row = $stmt->fetch()) {
@@ -16,10 +16,12 @@ if ($method === 'GET') {
             'name' => $row['name'],
             'start_time' => (int)$row['start_time'],
             'end_time' => (int)$row['end_time'],
-            'waypoints' => json_decode($row['waypoints'], true)
+            'distance' => (float)$row['distance'],
+            'speed_avg' => (float)$row['speed_avg'],
+            'speed_max' => (float)$row['speed_max']
         ];
     }
-    
+
     echo json_encode($results);
 } elseif ($method === 'DELETE') {
     $id = isset($_GET['id']) ? (int)$_GET['id'] : null;

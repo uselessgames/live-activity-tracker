@@ -213,23 +213,40 @@ document.getElementById('saveNameBtn').addEventListener('click', () => {
   })
   .then(res => res.json())
   .then(data => {
-    if (data.success) {
-      alert('Track saved successfully!');
-      resetInfoPanel();
-    } else {
-      alert('Failed to save track: ' + (data.error || 'Unknown error'));
-    }
+    const nameInputContainer = document.getElementById('nameInputContainer');
+    const buttonsContainer = document.getElementById('buttonsContainer');
+    const statusContainer = document.getElementById('statusContainer');
+    
+    nameInputContainer.classList.remove('visible');
+    buttonsContainer.classList.add('hidden');
+    
+    statusContainer.innerHTML = data.success 
+      ? '<span class="status-success"><i class="fa-solid fa-check"></i> Track saved successfully</span>'
+      : '<span class="status-error"><i class="fa-solid fa-xmark"></i> Failed to save track: ' + (data.error || 'Unknown error') + '</span>';
+    
+    statusContainer.classList.add('visible');
   })
   .catch(err => {
-    alert('Error saving track: ' + err.message);
+    const nameInputContainer = document.getElementById('nameInputContainer');
+    const buttonsContainer = document.getElementById('buttonsContainer');
+    const statusContainer = document.getElementById('statusContainer');
+    
+    nameInputContainer.classList.remove('visible');
+    buttonsContainer.classList.add('hidden');
+    
+    statusContainer.innerHTML = '<span class="status-error"><i class="fa-solid fa-xmark"></i> Error saving track: ' + err.message + '</span>';
+    
+    statusContainer.classList.add('visible');
   });
 });
 
 function resetInfoPanel() {
   const inputContainer = document.getElementById('nameInputContainer');
   const buttonsContainer = document.getElementById('buttonsContainer');
+  const statusContainer = document.getElementById('statusContainer');
   
   inputContainer.classList.remove('visible');
+  statusContainer.classList.remove('visible');
   
   setTimeout(() => {
     buttonsContainer.classList.remove('hidden');
