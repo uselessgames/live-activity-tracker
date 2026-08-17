@@ -29,8 +29,8 @@ function viewActivity(id) {
   alert('View feature not implemented yet');
 }
 
-function deleteActivity(id, name) {
-  if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
+function deleteActivity(id) {
+  if (!confirm('Are you sure you want to delete this activity?')) return;
 
   fetch(`api/activities.php?id=${id}`, {
     method: 'DELETE'
@@ -47,6 +47,73 @@ function deleteActivity(id, name) {
     .catch(err => {
       alert('Error deleting activity: ' + err.message);
     });
+}
+
+function editActivity(id, event) {
+  const row = event.currentTarget.closest('tr');
+  const nameCell = row.querySelector('.activity-name-cell');
+  const currentName = nameCell.querySelector('.activity-name').textContent;
+  
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'edit-name-input';
+  input.value = currentName;
+  input.maxLength = 50;
+  
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'save-name-btn';
+  saveBtn.innerHTML = '<i class="fa-solid fa-check"></i>';
+  
+  nameCell.innerHTML = '';
+  nameCell.appendChild(input);
+  nameCell.appendChild(saveBtn);
+  
+  input.focus();
+  
+  const cancelEdit = () => {
+    location.reload();
+  };
+  
+  const saveEdit = () => {
+    const newName = input.value.trim();
+    
+    if (newName === '') {
+      alert('Name cannot be empty');
+      return;
+    }
+    
+    if (newName.length > 50) {
+      alert('Name must be 50 characters or less');
+      return;
+    }
+    
+    fetch(`api/activities.php?id=${id}`, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ name: newName })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        } else {
+          alert('Failed to update activity: ' + (data.error || 'Unknown error'));
+        }
+      })
+      .catch(err => {
+        alert('Error updating activity: ' + err.message);
+      });
+  };
+  
+  saveBtn.addEventListener('click', saveEdit);
+  
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      saveEdit();
+    } else if (e.key === 'Escape') {
+      cancelEdit();
+    }
+  });
 }
 
 fetch('api/activities.php')
@@ -66,7 +133,12 @@ fetch('api/activities.php')
       const waypointCount = activity.waypoints ? activity.waypoints.length : 0;
 
       row.innerHTML = `
-        <td>${activity.name}</td>
+        <td class="activity-name-cell">
+          <span class="activity-name">${activity.name}</span>
+          <button class="edit-name-btn" onclick="editActivity(${activity.id}, event)">
+            <i class="fa-solid fa-pen"></i>
+          </button>
+        </td>
         <td>${activity.tracker_id}</td>
         <td>${formatTime(activity.start_time)}</td>
         <td>${duration}</td>
@@ -75,7 +147,7 @@ fetch('api/activities.php')
           <button class="view-btn" onclick="viewActivity(${activity.id})">
             <i class="fa-solid fa-eye"></i> View
           </button>
-          <button class="delete-btn" onclick="deleteActivity(${activity.id}, '${activity.name}')">
+          <button class="delete-btn" onclick="deleteActivity(${activity.id})">
             <i class="fa-solid fa-trash"></i> Delete
           </button>
         </td>

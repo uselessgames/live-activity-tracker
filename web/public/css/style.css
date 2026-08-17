@@ -1,5 +1,9 @@
-#map { height: 100vh; }
-body { margin: 0; }
+#map { 
+  height: 100vh; 
+}
+body { 
+  margin: 0; 
+}
 .crosshair-btn {
   background: #fff;
   width: 30px;
@@ -10,9 +14,16 @@ body { margin: 0; }
   cursor: pointer;
   box-shadow: 0 1px 5px rgba(0,0,0,0.4);
 }
-.crosshair-btn:hover { background: #f4f4f4; }
-.crosshair-btn i { color: #333; font-size: 16px; }
-.crosshair-btn.active i { color: #2a7fff; }
+.crosshair-btn:hover { 
+  background: #f4f4f4; 
+}
+.crosshair-btn i { 
+  color: #333; 
+  font-size: 16px; 
+}
+.crosshair-btn.active i { 
+  color: #2a7fff; 
+}
 .location-dot i {
   color: #FF0077;
   font-size: 41px;
@@ -31,8 +42,13 @@ body { margin: 0; }
   justify-content: center;
   cursor: pointer;
 }
-.menu-toggle:hover { background: #f4f4f4; }
-.menu-toggle i { color: #333; font-size: 16px; }
+.menu-toggle:hover { 
+  background: #f4f4f4; 
+}
+.menu-toggle i { 
+  color: #333; 
+  font-size: 16px; 
+}
 .menu-content {
   display: none;
   padding: 0 10px 10px;
@@ -40,7 +56,9 @@ body { margin: 0; }
   color: #666;
   width: 200px;
 }
-.menu-control.expanded .menu-content { display: block; }
+.menu-control.expanded .menu-content { 
+  display: block; 
+}
 .menu-row {
   display: flex;
   align-items: center;
@@ -68,7 +86,9 @@ body { margin: 0; }
   min-width: 240px;
   z-index: 1000;
 }
-.info-panel.visible { display: block; }
+.info-panel.visible { 
+  display: block; 
+}
 .info-header {
   display: flex;
   justify-content: space-between;
@@ -93,8 +113,17 @@ body { margin: 0; }
 }
 .info-actions {
   margin-top: 12px;
+  position: relative;
+  min-height: 44px;
+}
+.buttons-container {
   display: flex;
   gap: 8px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.buttons-container.hidden {
+  transform: translateX(100%);
+  opacity: 0;
 }
 .save-btn {
   padding: 8px 16px;
@@ -104,8 +133,52 @@ body { margin: 0; }
   border-radius: 4px;
   cursor: pointer;
 }
-.save-btn:hover { background: #218838; }
-
+.save-btn:hover { 
+  background: #218838; 
+}
+.clear-btn {
+  padding: 8px 16px;
+  border: none;
+  background: #6c757d;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.clear-btn:hover { 
+  background: #5a6268; 
+}
+/* saving activity */
+.name-input-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  display: none;
+}
+.name-input-container.visible {
+  display: flex;
+}
+#activityNameInput {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+#saveNameBtn {
+  padding: 8px 12px;
+  border: none;
+  background: #007bff;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 8px;
+}
+#saveNameBtn:hover { 
+  background: #0056b3; 
+}
+#saveNameBtn i { margin: 0; }
+/* Activites page */
 .activities-container {
   padding: 20px;
   max-width: 1200px;
@@ -124,7 +197,9 @@ body { margin: 0; }
   cursor: pointer;
   margin-right: 15px;
 }
-.back-btn:hover { background: #e0e0e0; }
+.back-btn:hover { 
+  background: #e0e0e0; 
+}
 .activities-table {
   width: 100%;
   border-collapse: collapse;
@@ -143,6 +218,49 @@ body { margin: 0; }
 .activities-table td {
   vertical-align: middle;
 }
+.activity-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  overflow: hidden;
+  vertical-align: middle;
+}
+.edit-name-btn {
+  padding: 4px 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: #007bff;
+  font-size: 14px;
+}
+.edit-name-btn:hover {
+  opacity: 1;
+}
+.activity-name-cell:not(.editing):hover .edit-name-btn {
+  opacity: 1;
+}
+.edit-name-input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background: #fff;
+}
+.save-name-btn {
+  padding: 12px;
+  border: none;
+  background: #28a745;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.save-name-btn:hover {
+  background: #218838;
+}
 .actions {
   display: flex;
   gap: 8px;
@@ -157,10 +275,13 @@ body { margin: 0; }
   background: #007bff;
   color: white;
 }
-.view-btn:hover { background: #0056b3; }
+.view-btn:hover { 
+  background: #0056b3; 
+}
 .delete-btn {
   background: #dc3545;
   color: white;
 }
-.delete-btn:hover { background: #c82333; }
-
+.delete-btn:hover { 
+  background: #c82333; 
+}

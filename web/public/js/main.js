@@ -80,7 +80,7 @@ const MenuControl = L.Control.extend({
   onAdd: function () {
     const container = L.DomUtil.create('div', 'leaflet-bar menu-control');
     const menuTemplate = document.getElementById('menuControl');
-    container.appendChild(menuTemplate.cloneNode(true));
+    container.appendChild(menuTemplate.content.cloneNode(true));
     L.DomEvent.disableClickPropagation(container);
     const toggle = container.querySelector('.menu-toggle');
     L.DomEvent.on(toggle, 'click', () => {
@@ -149,8 +149,41 @@ document.getElementById('trackToggleBtn').addEventListener('click', () => {
   document.getElementById('trackToggleBtn').textContent = trackVisible[activeTrackerId] ? 'Hide' : 'Show';
 });
 
+let isEditingName = false;
+
 document.getElementById('saveBtn').addEventListener('click', () => {
   if (activeTrackerId === null || !trackPoints[activeTrackerId]) return;
+
+  if (isEditingName) return;
+
+  const inputContainer = document.getElementById('nameInputContainer');
+  const buttonsContainer = document.getElementById('buttonsContainer');
+  
+  buttonsContainer.classList.add('hidden');
+  
+  setTimeout(() => {
+    inputContainer.classList.add('visible');
+  }, 300);
+  
+  isEditingName = true;
+});
+
+document.getElementById('saveNameBtn').addEventListener('click', () => {
+  if (activeTrackerId === null || !trackPoints[activeTrackerId]) return;
+
+  const input = document.getElementById('activityNameInput');
+  let name = input.value.trim();
+
+  if (name === '') {
+    const firstPointTime = trackPoints[activeTrackerId][0][2];
+    const date = new Date(firstPointTime * 1000);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    name = `Activity on ${year}/${month}/${day}`;
+  } else {
+    name = name.substring(0, 50);
+  }
 
   const points = trackPoints[activeTrackerId];
 
@@ -161,6 +194,7 @@ document.getElementById('saveBtn').addEventListener('click', () => {
 
   const saveData = {
     tracker_id: activeTrackerId,
+    name: name,
     start_time: firstPointTime,
     end_time: lastPointTime,
     duration: duration,
@@ -181,6 +215,7 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   .then(data => {
     if (data.success) {
       alert('Track saved successfully!');
+      resetInfoPanel();
     } else {
       alert('Failed to save track: ' + (data.error || 'Unknown error'));
     }
@@ -188,6 +223,50 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   .catch(err => {
     alert('Error saving track: ' + err.message);
   });
+});
+
+function resetInfoPanel() {
+  const inputContainer = document.getElementById('nameInputContainer');
+  const buttonsContainer = document.getElementById('buttonsContainer');
+  
+  inputContainer.classList.remove('visible');
+  
+  setTimeout(() => {
+    buttonsContainer.classList.remove('hidden');
+  }, 300);
+  
+  document.getElementById('activityNameInput').value = '';
+  isEditingName = false;
+}
+
+document.getElementById('clearTrackBtn').addEventListener('click', () => {
+  if (activeTrackerId === null) return;
+
+  if (!confirm('Are you sure?')) return;
+
+  delete trackPoints[activeTrackerId];
+  delete tracks[activeTrackerId];
+  delete trackVisible[activeTrackerId];
+
+  if (markers[activeTrackerId]) {
+    map.removeLayer(markers[activeTrackerId]);
+    delete markers[activeTrackerId];
+  }
+
+  fetch(`api/delete_track.php?id=${activeTrackerId}`, {
+    method: 'DELETE'
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert('Track cleared successfully!');
+      } else {
+        alert('Failed to clear track: ' + (data.error || 'Unknown error'));
+      }
+    })
+    .catch(err => {
+      alert('Error clearing track: ' + err.message);
+    });
 });
 
 document.getElementById('activitiesBtn').addEventListener('click', () => {
@@ -254,7 +333,7 @@ ws.onmessage = (event) => {
   const zoom = map.getZoom();
   addPoint(pos.tracker_id, pos.lat, pos.lon, pos.time_recorded, pos.speed_calculated, true);
   const hash = `#${zoom}/${pos.lat.toFixed(6)}/${pos.lon.toFixed(6)}`;
-  history.replaceState(null, '', hash);
+  history.replaceState(null, '', `/${hash}`);
 };
 
 fetch('api/track.php')

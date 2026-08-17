@@ -39,6 +39,34 @@ if ($method === 'GET') {
     } else {
         echo json_encode(['success' => false, 'error' => 'Activity not found']);
     }
+} elseif ($method === 'PUT') {
+    $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
+    
+    if (!$id) {
+        echo json_encode(['success' => false, 'error' => 'Missing activity ID']);
+        exit;
+    }
+    
+    $input = json_decode(file_get_contents('php://input'), true);
+    $name = $input['name'] ?? null;
+    
+    if ($name === null) {
+        echo json_encode(['success' => false, 'error' => 'Missing name']);
+        exit;
+    }
+    
+    $sanitized_name = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+    
+    $pdo = new PDO('pgsql:host=db;dbname=tracking', 'tracking', 'tracking');
+    
+    $stmt = $pdo->prepare('UPDATE activities SET name = ? WHERE id = ?');
+    $stmt->execute([$sanitized_name, $id]);
+    
+    if ($stmt->rowCount() > 0) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'error' => 'Activity not found']);
+    }
 } else {
     echo json_encode(['success' => false, 'error' => 'Method not allowed']);
 }

@@ -22,11 +22,18 @@ header('Content-Type: text/html; charset=utf-8');
     <div class="info-row">Speed: <span id="infoSpeed"></span> (estimated)</div>
     <div class="info-row">Track: <button class="track-toggle" id="trackToggleBtn"></button></div>
     <div class="info-actions">
-      <button class="save-btn" id="saveBtn">Save Activity</button>
+      <div class="buttons-container" id="buttonsContainer">
+        <button class="save-btn" id="saveBtn">Save Activity</button>
+        <button class="clear-btn" id="clearTrackBtn">Clear Track</button>
+      </div>
+      <div class="name-input-container" id="nameInputContainer">
+        <input type="text" id="activityNameInput" maxlength="50" placeholder="Enter activity name...">
+        <button class="save-name-btn" id="saveNameBtn"><i class="fa-solid fa-arrow-right"></i></button>
+      </div>
     </div>
   </div>
 
-  <div id="menuControl" class="hidden">
+  <template id="menuControl">
     <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
     <div class="menu-content">
       <div class="layer-toggle">
@@ -41,7 +48,7 @@ header('Content-Type: text/html; charset=utf-8');
         </button>
       </div>
     </div>
-  </div>
+</template>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="js/main.js"></script>
